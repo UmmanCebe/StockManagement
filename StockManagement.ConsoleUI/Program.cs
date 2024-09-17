@@ -3,9 +3,10 @@
 // Tüm kategorileri listeleyen kodu yazınız.
 // Kullanıcıdan kategori verilerini alan ve listyi ekran çıktısı olarak yazan kodu yazınız.
 // Ürünlerin fiyat toplamını gösteren kodu yazınız.
-// Kullanıcıdan iki değer alalım bunlar max ve min değerler olsun. Bu aralıkta ne kadar stok verisi varsa ekrana yazsın.
+// Kullanıcıdan iki değer alalım bunlar max ve min değerler olsun. Bu aralıkta ne kadar stok verisi varsa ekrana yazsın.(price için)
 // Ürünler listesinde bir isim parametresi alarak ürün isimlerinden uyuşanları listeleyelim.
 // ProductDetail(ProductName, ProductPrice,ProductStock,CategoryName) kullanarak ürün detaylarının listesini ekrana yazınız.
+//pagination desteği getirelecek.
 
 
 using StockManagement.ConsoleUI;
@@ -32,7 +33,12 @@ List<Category> categories = new List<Category>()
 
 //GetAllCategories();
 //GetAllProducts();
-AddProductAndGetAll();
+//AddProductAndGetAll();
+//GetAllProductPriceSum();
+//GetAllPriceRange(500, 15000);
+//GetAllProductByPriceFiltered();
+//GetAllProductNameContains();
+DeleteProduct();
 
 
 void GetAllCategories()
@@ -95,6 +101,100 @@ void AddProductAndGetAll()
     Product createdProduct = new Product(id, name, price, stock);
 
     products.Add(createdProduct);
+
+    foreach (Product product in products)
+    {
+        Console.WriteLine(product);
+    }
+}
+
+void GetAllProductPriceSum()
+{
+    Ayrac("Tüm Ürünlerin Toplam Fiyatı");
+    double total = 0;
+
+    foreach (Product product in products)
+    {
+        total += product.Price;
+    }
+    Console.WriteLine(total);
+}
+
+void GetAllPriceRange(double min, double max)
+{
+    Ayrac($"{min} ile {max} değer arasındaki ürünler");
+    foreach (Product product in products)
+    {
+        if (product.Price >= min && product.Price <= max)
+        {
+            Console.WriteLine(product);
+        }
+    }
+}
+
+void GetPriceRangeData(out double min, out double max)
+{
+    Console.WriteLine("Lütfen Minimum değeri Giriniz");
+    min = Convert.ToDouble(Console.ReadLine());
+
+    Console.WriteLine("Lütfen Minimum değeri Giriniz");
+    max = Convert.ToDouble(Console.ReadLine());
+}
+
+void GetAllProductByPriceFiltered()
+{
+    double min;
+    double max;
+    GetPriceRangeData(out min, out max);
+    GetAllPriceRange(min, max);
+}
+
+void GetAllProductNameContains()
+{
+    Ayrac("Filtrelenen Ürün İsmine Göre Gelen Ürünler");
+    string text = GetProductNameData();
+    foreach (Product product in products)
+    {
+        if (product.Name.Contains(text, StringComparison.InvariantCultureIgnoreCase))
+        {
+            Console.WriteLine(product);
+        }
+    }
+}
+
+string GetProductNameData()
+{
+    Console.WriteLine("Aramak İstediğiniz Ürününü Yazınız");
+    string text = Console.ReadLine();
+    return text;
+}
+
+void DeleteProduct()
+{
+    Ayrac("Silme İşlemi");
+
+    Console.WriteLine("Lütfen Ürün id Giriniz..");
+    int id = Convert.ToInt32(Console.ReadLine());
+    bool isPresent = true;
+
+    foreach (Product product in products)
+    {
+        if (product.Id != id)
+        {
+            isPresent = false;
+        }
+        else
+        {
+            isPresent = true;
+            products.Remove(product);
+            break;
+        }
+    }
+    if (!isPresent)
+    {
+        Console.WriteLine($"Aradığınız {id} id li ürün bulunamadı");
+        return;
+    }
 
     foreach (Product product in products)
     {
