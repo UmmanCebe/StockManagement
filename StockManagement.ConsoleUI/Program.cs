@@ -6,6 +6,7 @@
 // Kullanıcıdan iki değer alalım bunlar max ve min değerler olsun. Bu aralıkta ne kadar stok verisi varsa ekrana yazsın.(price için)
 // Ürünler listesinde bir isim parametresi alarak ürün isimlerinden uyuşanları listeleyelim.
 // ProductDetail(ProductName, ProductPrice,ProductStock,CategoryName) kullanarak ürün detaylarının listesini ekrana yazınız.
+// Ürün kaç adet isteniyorsa o kadar satılsın  eğer stokta varsa satılsın ve stok 0 olursa o ürün listeden silinsin. Eğer stok yetersiz ise alabileceği max ürün sayısı gösterilsin.
 //pagination desteği getirelecek.
 
 
@@ -38,7 +39,8 @@ List<Category> categories = new List<Category>()
 //GetAllPriceRange(500, 15000);
 //GetAllProductByPriceFiltered();
 //GetAllProductNameContains();
-DeleteProduct();
+//DeleteProduct();
+StockUpdate();
 
 
 void GetAllCategories()
@@ -200,4 +202,64 @@ void DeleteProduct()
     {
         Console.WriteLine(product);
     }
+}
+
+void StockUpdate()
+{
+    GetAllProducts();
+    Ayrac("Güzellemek istediğiniz Veriyi yazınız...");
+
+    Console.WriteLine("Lütfen id Değerini Giriniz");
+    int id = Convert.ToInt32(Console.ReadLine());
+
+    Console.WriteLine("Lütfen stok değerini giriniz...");
+    int stock = Convert.ToInt32(Console.ReadLine());
+
+    Product product = new Product(0, String.Empty, 0, 0); // burada boş bir nesne tanımladıkki null bir değer geldiğinde hata almayalım
+
+    foreach (Product p in products)
+    {
+        if (p.Id == id)
+        {
+            product = p;
+            break;
+        }
+    }
+
+    if (stock > product.Stock)
+    {
+        Console.WriteLine($"Bu üründen Maximum {product.Stock} kadar alabilirsiniz");
+        return;
+    }
+
+    int newStock = product.Stock - stock;
+    Product updatedProduct = new Product(
+          product.Id,
+          product.Name,
+          product.Price,
+          newStock
+        );
+
+    if (updatedProduct.Stock == 0)
+    {
+        products.Remove(product);
+        Console.WriteLine("Tüm ürünleri aldınız");
+        GetAllProducts();
+        return;
+    }
+
+    string productName = product.Name;
+    int adetSayisi = stock;
+
+    double totalPrice = stock * product.Price;
+
+    Console.WriteLine($"Ürün adı: {productName}");
+    Console.WriteLine($"Adet Sayısı: {adetSayisi}");
+    Console.WriteLine($"Total Ücret: {totalPrice}");
+
+    int indexProduct = products.IndexOf(product);
+
+    products.Remove(product);
+    products.Insert(indexProduct, updatedProduct);
+    GetAllProducts();
 }
