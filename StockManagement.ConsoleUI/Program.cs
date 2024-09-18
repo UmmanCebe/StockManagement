@@ -11,6 +11,8 @@
 
 
 using StockManagement.ConsoleUI;
+using System.Diagnostics;
+using System.Xml.Linq;
 
 List<Product> products = new List<Product>()
 {
@@ -34,13 +36,13 @@ List<Category> categories = new List<Category>()
 
 //GetAllCategories();
 //GetAllProducts();
-//AddProductAndGetAll();
+AddProduct();
 //GetAllProductPriceSum();
 //GetAllPriceRange(500, 15000);
 //GetAllProductByPriceFiltered();
 //GetAllProductNameContains();
 //DeleteProduct();
-StockUpdate();
+//StockUpdate();
 
 
 void GetAllCategories()
@@ -68,28 +70,80 @@ void Ayrac(string title)
     Console.WriteLine("------------------------------------------");
 }
 
-void AddProductAndGetAll()
+void AddProduct()
 {
     Ayrac("Ürün Ekle ve Listele");
-    Console.WriteLine("Lütfen Ürün id sini Giriniz");
-    int id = Convert.ToInt32(Console.ReadLine());
 
-    bool isUnique = true;
+    //int id;
+    //string name;
+    //double price;
+    //int stock;
 
-    foreach (Product product in products)
+    //GetProductAddedInput(out id, out name, out price, out stock);  // out keywordu ile metoda parametre verip verdiğimiz bu parametredeki değerleri dışarıdan okuyabiliyoruz.
+    Product createdProduct = GetProductAddedInputV2();
+    bool isValid = AddProductValidator(createdProduct);
+    if (isValid)
     {
-        if (product.Id == id)
+        products.Add(createdProduct);
+        GetAllProducts();
+    }
+}
+bool AddProductValidator(Product product)
+{
+    foreach (Product item in products)
+    {
+        if (item.Id == product.Id)
         {
-            isUnique = false;
-            break;
+
+            GetNotUniqueMessage("Id");
+            return false;
+        }
+
+        if (item.Name == product.Name)
+        {
+            GetNotUniqueMessage("Name");
+            return false;
         }
     }
 
-    if (!isUnique)
+    if (product.Stock <= 0)
     {
-        Console.WriteLine($"İd alanı benzersiz olmalı: {id}");
-        return;
+        Console.WriteLine("Eklemek istediğiniz Ürünün stok değeri negatif olamaz");
+        return false;
     }
+
+    if (product.Price <= 0)
+    {
+        Console.WriteLine("Eklemek istediğiniz Ürünün Fiyat değeri negatif olamaz");
+        return false;
+    }
+    return true;
+}
+void GetNotUniqueMessage(string property)
+{
+    Console.WriteLine($"Eklemek istediğiniz ürünün alanı Benzersiz olmalıdır. : {property}");
+
+}
+
+void GetProductAddedInput(out int id, out string name, out double price, out int stock)
+{
+    Console.WriteLine("Lütfen Ürün id sini Giriniz");
+    id = Convert.ToInt32(Console.ReadLine());
+
+    Console.WriteLine("Lütfen Ürün Adını Giriniz");
+    name = Console.ReadLine();
+
+    Console.WriteLine("Lütfen Ürün Değerini Giriniz");
+    price = Convert.ToInt32(Console.ReadLine());
+
+    Console.WriteLine("Lütfen Ürün Stok Adedini Giriniz");
+    stock = Convert.ToInt32(Console.ReadLine());
+}
+
+Product GetProductAddedInputV2() // burada da classla yaptık.
+{
+    Console.WriteLine("Lütfen Ürün id sini Giriniz");
+    int id = Convert.ToInt32(Console.ReadLine());
 
     Console.WriteLine("Lütfen Ürün Adını Giriniz");
     string name = Console.ReadLine();
@@ -100,14 +154,8 @@ void AddProductAndGetAll()
     Console.WriteLine("Lütfen Ürün Stok Adedini Giriniz");
     int stock = Convert.ToInt32(Console.ReadLine());
 
-    Product createdProduct = new Product(id, name, price, stock);
-
-    products.Add(createdProduct);
-
-    foreach (Product product in products)
-    {
-        Console.WriteLine(product);
-    }
+    Product product = new Product(id, name, price, stock);
+    return product;
 }
 
 void GetAllProductPriceSum()
